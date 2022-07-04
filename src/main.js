@@ -10,11 +10,12 @@ import 'element-plus/dist/index.css'
 import store from './store'
 
 import { confirm } from '@/libs/customPlugin/confirm'
+// 核心插件
+import d2Admin from '@/plugin/d2admin'
 
 const app = createApp(App)
 
 app.config.globalProperties.$myConfirm = confirm;
 
-app.use(Routes)
-  .use(ElementPlus).use(store)
+app.use(Routes).use(ElementPlus).use(store).use(d2Admin)
 app.mount('#app')

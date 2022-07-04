@@ -38,7 +38,7 @@ export default {
 <style scoped lang="scss">
 @import "~@/assets/index.scss";
 .system{
-  height: 100vh;
+  //height: 100vh;
   background-color: $color-bg;
   .system-top{
     line-height: #{$top};
@@ -52,10 +52,10 @@ export default {
     }
   }
   .system-content{
-    height: calc(100vh - 60px);
+    height: calc(100vh - 80px);
     display: flex;
     .content-left{
-      width: 230px;
+      min-width: 230px;
       background-color: white;
       .leftContent{
         width: 100%;
@@ -75,7 +75,7 @@ export default {
       }
     }
     .content-right{
-      width: calc(100vw);
+      width: calc(100vw - 245px);
       background-color: white;
       margin-top: 10px;
       margin-left: 10px;
