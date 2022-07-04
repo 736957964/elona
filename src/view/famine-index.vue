@@ -1,14 +1,13 @@
 <template>
-    <prefab-data></prefab-data>
+<!--    <prefab-data></prefab-data>-->
+  <div>123</div>
 </template>
 
 <script>
-import prefabData from './prefabs/prefab-data'
+
 export default {
   name: "famine-index",
-  components: {
-    prefabData
-  },
+  components: {},
   data() {
     return{
 
