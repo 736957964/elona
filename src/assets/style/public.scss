@@ -1,0 +1,23 @@
+$top:'60px';
+$vh1:"100vh";
+$vh2:"85vh";
+.footer-page{
+  position: absolute;
+  right: 0;
+  border-top: 1px solid #EBEDF0;
+  height: calc(#{$vh1} - #{$vh2} - #{$top});
+  width: 100%;
+}
+.content-vh{
+  height: calc(#{$vh2} - #{$top});
+}
+.pos-right{
+  position: absolute;
+  right: 10px;
+  bottom: 20px;
+}
+.text-line-feed{
+  word-wrap: break-word;
+  word-break: break-all;
+  overflow: hidden;
+}
