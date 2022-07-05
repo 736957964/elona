@@ -3,7 +3,7 @@ import Qs from 'qs';// qs 是一个增加了一些安全性的查询字符串解
 // Message  是提示框   分为三个状态,具体查询element-ui
 // Loading.service({fullscreen: true, background: 'rgba(0, 0, 0, 0.7)'}) 是遮罩层 用 .close() 关闭
 // MessageBox.confirm() //提示弹框
-import { Message, MessageBox } from 'element-plus';
+import { ElMessage } from 'element-plus';
 import router from '@/router';// 指向的是路由
 
 const CODE_SUCCESS = 1;// 状态成功码
@@ -75,12 +75,13 @@ const request = function (obj) {
           case 505:errMsg = 'HTTP版本不受支持'; break;
           default: errMsg = error.response.data.msg; break;// 不知道什么东西
         }
-        Message.error(errMsg)
+        ElMessage.error(errMsg)
+        return Promise.reject(error)
       } else {// 服务器连结果都没返回  1.服务器崩了 2.断网了
         if (error.code === 'ECONNABORTED') {errMsg = '请求超时'; }
         else { errMsg = error.message; }
         if ((error && error.response && error.response.config && (!error.response.config.params || error.response.config.params.isShowErrorMsg !== false)) || error.code === 'ECONNABORTED') {
-          Message.error(errMsg);
+          ElMessage.error(errMsg);
         }
         // /////////////////////////
         if (!window.navigator.onLine) {  return; }// 无网  断网处理：可以跳转到断网页面

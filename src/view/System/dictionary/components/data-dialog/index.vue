@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import { insertTableData } from '@/api/base'
+import { insertTableData, reviseTableData } from '@/api/base'
 import { DictAdd, DictUpdate } from '@/api/system/dict'
 
 import rules from './config/rules'
@@ -85,12 +85,13 @@ export default {
      * 提交
      */
     async doSubmit() {
+      const { keyName, dictKey, remarks } = this.ruleForm
       const data = {
-        tableName: 'user',
-        insertSql:`(user_id,exp,ll) VALUES (121,555,77)`
+        tableName: 'dictionary',
+        insertSql:`(keyName,dictKey,remarks) VALUES ('${keyName}','${dictKey}','${remarks}')`
       }
       try {
-        await (this.currentRowObj ? DictUpdate : insertTableData)(data)
+        await (this.currentRowObj ? reviseTableData : insertTableData)(data)
         this.$message.success(
           `数据字典${this.currentRowObj ? '修改' : '新增'}成功`
         )

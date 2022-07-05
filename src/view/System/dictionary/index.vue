@@ -111,6 +111,7 @@ import DictConfigDraw from './components/dict-config-draw'
 
 import { DictList, DictDel, DictStatusChange } from '@/api/system/dict'
 
+import { getTableData } from '@/api/base'
 import tableMixin from '@/mixins/tableMixin'
 
 export default {
@@ -129,22 +130,22 @@ export default {
       // 字典配置开关
       dictConfigDrawVisible: false,
       // 列表接口名
-      getTableListSyncMethod: DictList,
-      loadDataDirectory:false,
+      getTableListSyncMethod: getTableData,
       // 当前行数据
       currentRowObj: null
     }
   },
-  computed: {
-    appId() {
-      return parseInt(this.$route.params.appId)
-    }
-  },
+  computed: { },
   watch: {},
   created() {},
   mounted() {},
   unmounted() {},
   methods: {
+    postDataFormat(){
+      return {
+        tableName: 'dictionary'
+      }
+    },
     /**
      * 新增
      */
