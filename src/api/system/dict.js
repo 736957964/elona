@@ -1,6 +1,5 @@
 import request from '@/plugin/axios'
-const BASE_URL = `${process.env.VUE_APP_SYSTEM}/sys/dict`
-// const BASE_URL = 'sys/dict'
+const BASE_URL = `${process.env.VUE_APP_SYSTEM}/dataDictionary`
 
 export function DictList(data) {
   return request({
@@ -9,15 +8,15 @@ export function DictList(data) {
     params: data
   })
 }
-
+// 添加
 export function DictAdd(data) {
   return request({
-    url: BASE_URL + '/key',
+    url: BASE_URL + '/add',
     method: 'post',
     data
   })
 }
-
+// 修改
 export function DictUpdate(data) {
   return request({
     url: BASE_URL + '/key',

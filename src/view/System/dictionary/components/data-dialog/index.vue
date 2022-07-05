@@ -4,12 +4,11 @@
     width="500px"
     :close-on-click-modal="false"
     :destroy-on-close="true"
-    :visible="dialogVisible"
+    :model-value="dialogVisible"
     class="dialog-wrapper"
     @close="close"
   >
     <el-form
-      v-if="dialogVisible"
       ref="ruleForm"
       :model="ruleForm"
       label-position="top"
@@ -51,6 +50,7 @@
 </template>
 
 <script>
+import { insertTableData } from '@/api/base'
 import { DictAdd, DictUpdate } from '@/api/system/dict'
 
 import rules from './config/rules'
@@ -85,8 +85,12 @@ export default {
      * 提交
      */
     async doSubmit() {
+      const data = {
+        tableName: 'user',
+        insertSql:`(user_id,exp,ll) VALUES (121,555,77)`
+      }
       try {
-        await (this.currentRowObj ? DictUpdate : DictAdd)(this.ruleForm)
+        await (this.currentRowObj ? DictUpdate : insertTableData)(data)
         this.$message.success(
           `数据字典${this.currentRowObj ? '修改' : '新增'}成功`
         )
