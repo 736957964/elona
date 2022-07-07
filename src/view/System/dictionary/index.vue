@@ -1,10 +1,12 @@
 <template>
-  <div class="container-search-wrapper">
-    <page-header
-        ref="pageHeader"
-        @doSearch="doSearch"
-        @doReset="doReset"
-    />
+  <d2-container class="container-search-wrapper">
+    <template v-slot:header>
+      <page-header
+          ref="pageHeader"
+          @doSearch="doSearch"
+          @doReset="doReset"
+      />
+    </template>
     <!-- 中间内容容器 -->
     <div v-loading="loading" class="loading-wrapper">
       <el-button v-has="'dataAdd'" type="primary" icon="el-icon-plus" @click="doAdd">新增</el-button>
@@ -58,7 +60,7 @@
           <template v-slot="{ row }"> {{ row.updateDate || row.createDate }}</template>
         </el-table-column>
 
-        <el-table-column label="操作" align="center" width="150">
+        <el-table-column label="操作" align="center" width="200">
           <template v-slot="scope">
             <el-button
                 v-has="'dataEdit'"
@@ -93,15 +95,18 @@
         :current-row-obj="currentRowObj"
         @success="getTableData"
     />
+    <template v-slot:footer>
+      <footer-page
+          :page-size="pageSize"
+          :current-page="currentPage"
+          :total="total"
+          @handleSizeChange="handleSizeChange"
+          @handleCurrentChange="handleCurrentChange"
+      />
+    </template>
     <!-- 底部分页 -->
-    <footer-page
-      :page-size="pageSize"
-      :current-page="currentPage"
-      :total="total"
-      @handleSizeChange="handleSizeChange"
-      @handleCurrentChange="handleCurrentChange"
-    />
-  </div>
+
+  </d2-container>
 </template>
 
 <script>
@@ -132,7 +137,8 @@ export default {
       // 列表接口名
       getTableListSyncMethod: getTableData,
       // 当前行数据
-      currentRowObj: null
+      currentRowObj: null,
+      appId:0
     }
   },
   computed: { },

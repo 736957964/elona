@@ -88,7 +88,7 @@ export default {
       const { keyName, dictKey, remarks } = this.ruleForm
       const data = {
         tableName: 'dictionary',
-        insertSql:`(keyName,dictKey,remarks) VALUES ('${keyName}','${dictKey}','${remarks}')`
+        sqlValue:`(keyName,dictKey,remarks) VALUES ('${keyName}','${dictKey}','${remarks}')`
       }
       try {
         await (this.currentRowObj ? reviseTableData : insertTableData)(data)

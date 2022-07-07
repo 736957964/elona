@@ -145,7 +145,7 @@ export default {
      * 获取列表数据
      */
     async getTableList() {
-      const data = await this.getTableListSyncMethod({
+      const { data } = await this.getTableListSyncMethod({
         ...(this.isPageData && {
           current: this.currentPage,
           size: this.pageSize
