@@ -1,7 +1,21 @@
 // 背景色
 $color-bg: #f3f4f6;
 $color-cor1:#1989FA;
+.primary {
+  color: #409eff;
+}
 
+.yellow {
+  color: #ffa007;
+}
+
+.danger {
+  color: #f56c6c;
+}
+
+.disabled {
+  color: #c0c4cc;
+}
 // 先放这了
 body {
   margin: 0;

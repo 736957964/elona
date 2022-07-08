@@ -51,7 +51,6 @@
 
 <script>
 import { insertTableData, reviseTableData } from '@/api/base'
-import { DictAdd, DictUpdate } from '@/api/system/dict'
 
 import rules from './config/rules'
 
@@ -88,7 +87,8 @@ export default {
       const { keyName, dictKey, remarks } = this.ruleForm
       const data = {
         tableName: 'dictionary',
-        sqlValue:`(keyName,dictKey,remarks) VALUES ('${keyName}','${dictKey}','${remarks}')`
+        sqlValue:`(keyName,dictKey,remarks,status,createName) VALUES ('${keyName}','${dictKey}','${remarks}',1,'系统')`,
+        reviseSqlValue:`keyName='${keyName}',remarks='${remarks}' WHERE dictKey='${dictKey}'`
       }
       try {
         await (this.currentRowObj ? reviseTableData : insertTableData)(data)

@@ -24,6 +24,14 @@ export function getTableData(data) {
     data
   })
 }
+// 查询 get的请求
+export function getTableData_get(data) {
+  return request({
+    url: BASE_URL + '/getTableData',
+    method: 'get',
+    params: data
+  })
+}
 // 修改
 export function reviseTableData(data) {
   return request({

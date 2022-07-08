@@ -30,7 +30,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-  @import "~@/assets/index.scss";
   .container-component{
     width: 100%;
     height: 100%;

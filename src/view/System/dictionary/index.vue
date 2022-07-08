@@ -9,7 +9,7 @@
     </template>
     <!-- 中间内容容器 -->
     <div v-loading="loading" class="loading-wrapper">
-      <el-button v-has="'dataAdd'" type="primary" icon="el-icon-plus" @click="doAdd">新增</el-button>
+      <el-button type="primary" icon="Plus" @click="doAdd" style="margin-bottom: 10px">新增</el-button>
       <el-table
           style="width: 100%;"
           tooltip-effect="dark"
@@ -38,28 +38,31 @@
         <el-table-column label="状态" align="center">
           <template v-slot="scope">
             <template v-if="scope.row.status !== 2">
-              <i
-                  v-if="appId === scope.row.appId"
-                  :class="[scope.row.status === 1 ? 'el-icon-video-pause danger': 'el-icon-video-play primary', 'd2-mr-10','link']"
-                  @click="statusChange(scope.row)"
-              />
+              <el-icon v-show="scope.row.status === 1" class="danger d2-mr-10" @click="statusChange(scope.row)"><VideoPause /></el-icon>
+              <el-icon v-show="scope.row.status === 0" class="link d2-mr-10" @click="statusChange(scope.row)"><VideoPlay /></el-icon>
               {{ scope.row.status === 1 ? '已启用' : '已停用' }}
             </template>
 
             <template v-else>未配置</template>
           </template>
         </el-table-column>
-
         <el-table-column
             prop="createName"
             label="创建用户"
             show-overflow-tooltip
         />
-
-        <el-table-column label="操作时间" align="center" width="150">
-          <template v-slot="{ row }"> {{ row.updateDate || row.createDate }}</template>
-        </el-table-column>
-
+        <el-table-column
+            label="更新时间"
+            align="center"
+            width="150"
+            prop="updateDate"
+        />
+        <el-table-column
+            label="创建时间"
+            align="center"
+            width="150"
+            prop="createDate"
+        />
         <el-table-column label="操作" align="center" width="200">
           <template v-slot="scope">
             <el-button
@@ -119,6 +122,7 @@ import { DictList, DictDel, DictStatusChange } from '@/api/system/dict'
 import { getTableData } from '@/api/base'
 import tableMixin from '@/mixins/tableMixin'
 
+import { deleteTableData } from '@/api/base'
 export default {
   name: '',
   components: {
@@ -174,7 +178,11 @@ export default {
       await this.$myConfirm('确定要删除本条数据字典吗', this)
       try {
         const { dictKeyId } = row
-        await DictDel(dictKeyId)
+        const data = {
+          tableName: 'dictionary',
+          deleteSqlValue:`dictKeyId=${dictKeyId}`
+        }
+        await deleteTableData(data)
         this.$message.success('数据字典删除成功')
         this.getTableData()
       } catch (e) {
@@ -206,3 +214,8 @@ export default {
   }
 }
 </script>
+<style lang="scss" scoped>
+.colo{
+  color: $color-bg;
+}
+</style>

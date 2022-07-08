@@ -21,3 +21,49 @@ $vh2:"85vh";
   word-break: break-all;
   overflow: hidden;
 }
+// 工具类名统一前缀
+$prefix: d2;
+// 边距相关
+$sizes: (0, 5, 10, 15, 20);
+
+@for $index from 1 to 6 {
+  .#{$prefix}-m-#{nth($sizes, $index)} {
+    margin: #{nth($sizes, $index)}px !important;
+  }
+
+  .#{$prefix}-mt-#{nth($sizes, $index)} {
+    margin-top: #{nth($sizes, $index)}px !important;
+  }
+
+  .#{$prefix}-mr-#{nth($sizes, $index)} {
+    margin-right: #{nth($sizes, $index)}px !important;
+  }
+
+  .#{$prefix}-mb-#{nth($sizes, $index)} {
+    margin-bottom: #{nth($sizes, $index)}px !important;
+  }
+
+  .#{$prefix}-ml-#{nth($sizes, $index)} {
+    margin-left: #{nth($sizes, $index)}px !important;
+  }
+
+  .#{$prefix}-p-#{nth($sizes, $index)} {
+    padding: #{nth($sizes, $index)}px !important;
+  }
+
+  .#{$prefix}-pt-#{nth($sizes, $index)} {
+    padding-top: #{nth($sizes, $index)}px !important;
+  }
+
+  .#{$prefix}-pr-#{nth($sizes, $index)} {
+    padding-right: #{nth($sizes, $index)}px !important;
+  }
+
+  .#{$prefix}-pb-#{nth($sizes, $index)} {
+    padding-bottom: #{nth($sizes, $index)}px !important;
+  }
+
+  .#{$prefix}-pl-#{nth($sizes, $index)} {
+    padding-left: #{nth($sizes, $index)}px !important;
+  }
+}

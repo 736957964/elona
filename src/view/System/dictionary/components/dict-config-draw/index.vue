@@ -125,7 +125,7 @@ import dialogMixin from '@/mixins/dialogMixin'
 import { cloneDeep } from 'lodash'
 
 import { DictDetailAdd, DictDetail } from '@/api/system/dict'
-
+import { getTableData_get } from '@/api/base'
 export default {
   name: '',
   mixins: [dialogMixin],
@@ -192,8 +192,12 @@ export default {
       try {
         this.wrapperLoading = true
         const { dictKey } = this.currentRowObj
-        const data = await DictDetail(dictKey)
-
+        const dict = {
+          tableName: 'dictionarydata',
+          mysql:`dictKey=${dictKey}`
+        }
+        const data = await getTableData_get(dict)
+        console.log('获取数据', data)
         if (data) {
           this.tableData = data.sort((a, b) => a.sortBy - b.sortBy)
         }

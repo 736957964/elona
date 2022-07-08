@@ -5,8 +5,8 @@ export default {
     // let path = ''
     // let btnPermissionList = []
     Vue.directive('has', {
-      bind: function(el, binding) {
-        Vue.prototype.$_has(binding.value).then(val => {
+      mounted: function(el, binding) {
+        Vue.config.globalProperties.$_has(binding.value).then(val => {
           if (!val) {
             el.parentNode.removeChild(el)
           }

@@ -36,7 +36,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@import "~@/assets/index.scss";
 .system{
   //height: 100vh;
   background-color: $color-bg;
