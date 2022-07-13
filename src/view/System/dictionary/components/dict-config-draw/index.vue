@@ -4,7 +4,7 @@
     direction="rtl"
     size="800px"
     :wrapper-closable="false"
-    :visible="dialogVisible"
+    :model-value="dialogVisible"
     class="dict-config-draw"
     @close="close"
   >
@@ -19,7 +19,6 @@
           >
             <template v-slot="scope">
               <el-form-item
-                :prop="`tableData.${scope.$index}.dictName`"
                 required
               >
                 <el-input v-model="scope.row.dictName" />
@@ -35,7 +34,6 @@
           >
             <template v-slot="scope">
               <el-form-item
-                :prop="`tableData.${scope.$index}.dictValue`"
                 required
               >
                 <el-input v-model="scope.row.dictValue" />
@@ -124,8 +122,7 @@ import dialogMixin from '@/mixins/dialogMixin'
 
 import { cloneDeep } from 'lodash'
 
-import { DictDetailAdd, DictDetail } from '@/api/system/dict'
-import { getTableData_get } from '@/api/base'
+import { getTableData, insertTableData, reviseTableData } from '@/api/base'
 export default {
   name: '',
   mixins: [dialogMixin],
@@ -138,7 +135,8 @@ export default {
   data() {
     return {
       // table数据
-      tableData: []
+      tableData: [],
+      isInsert : true // true为新增 false为修改
     }
   },
   computed: {},
@@ -159,10 +157,18 @@ export default {
     async _DictDetailAdd() {
       try {
         this.btnLoading = true
-        await DictDetailAdd({
-          dictKeyId: this.currentRowObj.dictKeyId,
-          dictList: this.tableData
+        const { dictKey } = this.currentRowObj
+        this.tableData.map((res) => {
+          res.fa.slice(0, 2) === '{"' ?  res.fb = JSON.parse(res.fb) : ''
+          res.fb.slice(0, 2) === '{"' ?  res.fb = JSON.parse(res.fb) : ''
+          return res
         })
+        const data = {
+          tableName: 'dictionarydata',
+          sqlValue: `(dictKey,dictJson) VALUES ('${dictKey}','${JSON.stringify(this.tableData)}') `,
+          reviseSqlValue: `dictJson = '${JSON.stringify(this.tableData)}' WHERE dictKey = '${dictKey}'`
+        }
+        this.isInsert ? await insertTableData(data) : await reviseTableData(data) // 空的情况是新增 不然就是修改
         this.$message.success('字典配置成功')
         this.$emit('success')
         this.close()
@@ -192,14 +198,20 @@ export default {
       try {
         this.wrapperLoading = true
         const { dictKey } = this.currentRowObj
-        const dict = {
-          tableName: 'dictionarydata',
-          mysql:`dictKey=${dictKey}`
-        }
-        const data = await getTableData_get(dict)
-        console.log('获取数据', data)
-        if (data) {
-          this.tableData = data.sort((a, b) => a.sortBy - b.sortBy)
+        const dict = { tableName: 'dictionarydata', sqlValue:`dictKey='${dictKey}'`, type: 'first' }
+        const { data } = await getTableData(dict)
+        // const { data } = await DictList(dictKey) // 这个是后台处理好的 所以不用再额外处理了 用上面的方法需要拿 dictJson 由于需要判定是否为新增 所以还是拿的完整数据
+        if (data && data.dictJson) {
+          this.isInsert = false
+          const dictJson = JSON.parse(data.dictJson)
+          dictJson.map((res) => {
+            typeof (res.fa) === 'object' ? res.fa = JSON.stringify(res.fa) : ''
+            typeof (res.fb) === 'object' ? res.fb = JSON.stringify(res.fb) : ''
+            return res
+          })
+          this.tableData = dictJson && dictJson.length && dictJson.sort((a, b) => a.sortBy - b.sortBy) || []
+        } else {
+          this.isInsert = true
         }
       } catch (e) {
         console.log(e)
@@ -245,13 +257,13 @@ export default {
 }
 </script>
 
-<style lang="scss">
-.dict-config-draw {
+<style lang="scss" scoped>
+::v-deep {
   .el-input-number {
     width: 118px;
   }
   .el-form-item {
-    margin-bottom: 0 !important;
+    margin-bottom: 0!important;
   }
 }
 </style>

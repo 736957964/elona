@@ -24,7 +24,7 @@ export function getTableData(data) {
     data
   })
 }
-// 查询 get的请求
+// 查询 get的请求(弃用)
 export function getTableData_get(data) {
   return request({
     url: BASE_URL + '/getTableData',

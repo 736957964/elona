@@ -1,13 +1,23 @@
 import request from '@/plugin/axios'
 const BASE_URL = `${process.env.VUE_APP_SYSTEM}/dataDictionary`
 
-export function DictList(data) {
+
+export function DictList(dictName, data) {
+  !data ? data = { dictKey:dictName } : ''
   return request({
-    url: BASE_URL + '/key',
+    url:`${BASE_URL}/get`,
     method: 'get',
     params: data
   })
 }
+// ---------------
+// export function DictList(data) {
+//   return request({
+//     url: BASE_URL + '/key',
+//     method: 'get',
+//     params: data
+//   })
+// }
 // 添加
 export function DictAdd(data) {
   return request({

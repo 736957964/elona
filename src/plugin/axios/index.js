@@ -20,7 +20,7 @@ const request = function (obj) {
     paramsSerializer(params) {
       return Qs.stringify(params, { arrayFormat: 'repeat' }); // 针对get 和 delete 方法参数序列化
     },
-    transformRequest: [function (params) {// 改变请求,他是一个函数  看服务器要求需要什么格式
+    transformRequest: [function (params, headers) {// 改变请求,他是一个函数  看服务器要求需要什么格式
       // 对 data 进行任意转换处理
       return Qs.stringify(params, { arrayFormat: 'repeat' }); // 针对post和put方法参数序列化
     }],
@@ -88,7 +88,15 @@ const request = function (obj) {
         return Promise.reject(error);
       }
     });
-  return service[obj.method](obj.url, obj.data);
+  let url = obj.url
+  if(obj.method === 'get' && obj.params) {
+    let getData = ''
+    Object.keys(obj.params).forEach((res, index) => {
+      !index ? getData = `${getData}?${res}=${obj.params[res]}` : getData = `${getData}&&${res}=${obj.params[res]}`
+    })
+    url = obj.url + getData;
+  }
+  return service[obj.method](url, obj.data);
 };
 export default request
 //  https://www.bilibili.com/video/BV1LJ41177B9?from=search&seid=12035233222714277524
