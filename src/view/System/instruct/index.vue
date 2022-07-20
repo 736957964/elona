@@ -20,10 +20,18 @@
       <el-button type="primary" icon="Plus" @click="doAdd" style="margin-bottom: 10px">新增</el-button>
       <el-table :data="tableData" tooltip-effect="dark" style="width: 100%" border>
         <el-table-column prop="command" label="触发指令" width="180" />
-        <el-table-column prop="remarks" label="备注" width="180" />
-        <el-table-column prop="mode" label="模式" width="180" />
-        <el-table-column prop="textDescription" label="文本描述" width="180" />
-        <el-table-column prop="imageUrl" label="签到url"  />
+        <el-table-column prop="remarks" label="备注" width="120" />
+        <el-table-column prop="mode" label="模式" width="80" />
+        <el-table-column label="文本描述" width="180" >
+        <template v-slot="scope">
+          <text-prompt :textData="scope.row.textDescription" ></text-prompt>
+        </template>
+       </el-table-column>
+        <el-table-column label="签到url" width="180" >
+        <template v-slot="scope">
+          <text-prompt :textData="scope.row.imageUrl" ></text-prompt>
+        </template>
+        </el-table-column>
         <el-table-column label="操作" align="center" width="200">
           <template v-slot="scope">
             <el-button v-has="'dataEdit'" type="text"  @click="doEdit(scope.row)">修改</el-button>
@@ -45,13 +53,13 @@
 <script>
 import tableMixin from "@/mixins/tableMixin";
 import { deleteTableData, getTableData } from "@/api/base";
-
+import textPrompt from '@/components/text-prompt'
 // import PageHeader from '@/components/page-header'
 import commandDialog from '@/view/System/instruct/components/command-dialog'
 export default {
   name: "index",
   mixins: [tableMixin],
-  components:{ commandDialog },
+  components:{ commandDialog, textPrompt },
   data() {
     return {
       // 新增、编辑开关
@@ -69,10 +77,12 @@ export default {
       }
     },
     doAdd(){
+      this.currentRowObj = null
       this.dataDialogVisible = true
     },
-    doEdit(){
-
+    doEdit(row){
+      this.currentRowObj = row
+      this.dataDialogVisible = true
     },
     doConfig(){
 

@@ -35,7 +35,7 @@
             show-overflow-tooltip
         />
 
-        <el-table-column label="状态" align="center">
+        <el-table-column label="状态" align="center" width="120">
           <template v-slot="scope">
             <template v-if="scope.row.status !== 2">
               <el-icon v-show="scope.row.status === 1" class="danger d2-mr-10" @click="statusChange(scope.row)"><VideoPause /></el-icon>

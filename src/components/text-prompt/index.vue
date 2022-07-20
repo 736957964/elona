@@ -1,8 +1,10 @@
 <template>
   <div ref="telescopicAssembly" class="telescopicAssembly">
-    <el-tooltip :disabled="!isShow" :content="textData" :placement="placement" :open-delay="openDelay">
-      <div ref="assemblyText" class="assemblyText" @mouseover="mouseover" @mouseout="mouseout">{{ textData }}</div>
+    <el-tooltip :disabled="!isShow" :content="typeof(textData) ==='string' ? textData:JSON.stringify(textData)" :placement="placement" :open-delay="openDelay">
+      <div ref="assemblyText" class="assemblyText" @mouseover="mouseover" @mouseout="mouseout">{{ textData }} </div>
     </el-tooltip>
+    <!--这个插槽是用来放不需要进行省略处理文字的 比如  输入框 : 这里的：就不需要进行省略显示-->
+    <slot />
   </div>
 </template>
 
@@ -17,7 +19,7 @@ export default {
   },
   props: {
     // 显示的数据
-    textData: { type: String, default: '' },
+    textData: { type: null, default: '' },
     // 设置最小宽度
     minWidth: { type: Number, default: 30 },
     // 设置最大宽度,超出部分显示省略号 0不生效
@@ -28,7 +30,10 @@ export default {
     noOverflowShow: { type: Boolean, default: false },
     // 默认为 top 顶部显示 具体方位看 el-tooltip 组件
     placement: { type: String, default: 'top' },
-    openDelay: { type: Number, default: 0 }
+    // 打开延迟的毫秒数
+    openDelay: { type: Number, default: 0 },
+    // 大小宽度特殊处理 手动配置 maxWidth（为true时 maxWidth属性无效,部分特殊情况宽度没办法自动显示省略号 手动配置宽度）
+    specialSize: { type: Boolean, default: false }
   },
   data() {
     return {
@@ -43,8 +48,15 @@ export default {
   methods: {
     async initialization() {
       await this.$nextTick
+      if (this.specialSize) { // 手动获取宽度
+        // 可以通过 offsetWidth 来获取dom元素的实际宽度
+        await this.$emit('specialSize', (getSize) => {
+          this.$refs.assemblyText.style.maxWidth = `${getSize.maxWidth}px`
+        })
+      } else { // 自定义统一的宽度
+        if (this.$props.maxWidth) { this.$refs.assemblyText.style.maxWidth = `${this.$props.maxWidth}px` }
+      }
       if (this.$props.minWidth) { this.$refs.assemblyText.style.minWidth = `${this.$props.minWidth}px` }
-      if (this.$props.maxWidth) { this.$refs.assemblyText.style.maxWidth = `${this.$props.maxWidth}px` }
       if (this.$props.lineHeight) { this.$refs.assemblyText.style.lineHeight = `${this.$props.lineHeight}px` }
     },
     // 鼠标移入的时候
@@ -55,7 +67,7 @@ export default {
     },
     // 鼠标移出的时候
     mouseout() {
-      this.isShow = false
+      // this.isShow = false
     }
   }
 }
@@ -63,6 +75,7 @@ export default {
 
 <style scoped lang="scss">
 .telescopicAssembly{
+  display: flex;
   position: relative;
   .suspension{
     white-space: nowrap;

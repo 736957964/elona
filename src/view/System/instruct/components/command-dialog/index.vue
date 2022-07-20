@@ -1,7 +1,7 @@
 <template>
   <el-dialog
         :title="`${currentRowObj ? '修改' : '新增'}指令`"
-        width="500px"
+        width="700px"
         :close-on-click-modal="false"
         :destroy-on-close="true"
         :model-value="dialogVisible"
@@ -14,9 +14,9 @@
           label-position="top"
       >
         <el-form-item label="触发指令" prop="command">
-          <el-radio v-model="ruleForm.mode" label="1">普通模式</el-radio>
-          <el-radio v-model="ruleForm.mode" label="2">特殊模式</el-radio>
-          <el-radio v-model="ruleForm.mode" label="3">高级模式</el-radio>
+          <el-radio v-model="ruleForm.mode" label="1">普通文本模式</el-radio>
+          <el-radio v-model="ruleForm.mode" label="2">特殊模式(普通文本+功能)</el-radio>
+          <el-radio v-model="ruleForm.mode" label="3">高级模式(特殊文本+功能)</el-radio>
         </el-form-item>
         <el-form-item label="触发指令" prop="command">
           <el-input
@@ -25,16 +25,16 @@
           />
         </el-form-item>
 
-        <el-form-item label="文本描述" prop="textDescription" v-if="ruleForm.mode==='1'">
+        <el-form-item label="文本描述" prop="textDescription" v-if="ruleForm.mode!=='3'">
           <el-input
               v-model="ruleForm.textDescription"
               type="textarea"
-              rows="4"
+              rows="5"
               placeholder="请输入文本描述"
           />
         </el-form-item>
 
-        <el-form-item label="图片url" prop="dictKey" v-if="ruleForm.mode==='1'">
+        <el-form-item label="图片url" prop="imageUrl">
           <el-input
               v-model="ruleForm.imageUrl"
               placeholder="请输入图片url"
@@ -45,7 +45,7 @@
           <el-input
               v-model="ruleForm.remarks"
               type="textarea"
-              rows="4"
+              rows="2"
               placeholder="请输入描述"
           />
         </el-form-item>
@@ -96,16 +96,26 @@ export default {
       }
     },
     async doSubmit() {
-      const keys = Object.keys(this.ruleForm)
-      console.log(keys.join(','))
-      let keysData = null
+      const ruleForm = this.ruleForm
+      const { mode, id } = this.ruleForm
+      let keys = Object.keys(this.ruleForm).filter((res) => {return res !== 'id'})
+      console.log(mode)
+      switch (mode){
+        case '1':break;
+        case '2':break;
+        case '3':ruleForm.textDescription = '';ruleForm.imageUrl = '';break;
+        default:
+      }
+      console.log(keys)
+      let keysData = null, reviseData = null
       keys.forEach((res, index) => {
         keysData = keysData !== null ? index + 1 === keys.length ? `${keysData}${this.ruleForm[res]}'` : `${keysData}${this.ruleForm[res]}','` : index + 1 === keys.length ? `'${this.ruleForm[res]}'` : `'${this.ruleForm[res]}','`
+        reviseData = reviseData !== null ? index + 1 === keys.length ? `${reviseData}${res}='${this.ruleForm[res]}'` : `${reviseData}${res}='${this.ruleForm[res]}',` : `${res}='${this.ruleForm[res]}',`
       })
+      console.log(reviseData)
       let data = {
         tableName: 'command',
-        sqlValue:`(${keys.join(',')}) VALUES (${keysData})`,
-        // reviseSqlValue:`keyName='${keyName}',remarks='${remarks}' WHERE dictKey='${dictKey}'`
+        ...(this.currentRowObj ? { reviseSqlValue:`${reviseData} WHERE id='${id}'` } : { sqlValue:`(${keys.join(',')}) VALUES (${keysData})` })
       }
       try {
         await (this.currentRowObj ? reviseTableData : insertTableData)(data)
