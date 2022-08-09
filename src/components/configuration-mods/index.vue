@@ -1,35 +1,36 @@
 <template>
   <div class="configuration-mods text-line-feed">
+    <mods-top @success="success"/>
     <div class="content-mods">
        <div class="mod-right">
-<!--         <div class="content-type"></div>-->
-<!--         <div class="content-mark"></div>-->
-<!--         <div class="content-dispose"></div>-->
          <div class="right d2-ml-10"  style="display: flex;height: 100%">
            <div class="left-wrapper" >
              <div class="card-title" >
                <span>自定义：</span>
              </div>
              <el-card shadow="never" class="left-card">
+               <div v-for="(item, index) in Object.keys(fieldsArr)" :key="index" style="display:flex;flex-wrap: wrap">
+                 {{item}}:
                <draggable
-                   class="left-drag-wrapper" :list="fieldsArr"
+                   class="left-drag-wrapper" :list="fieldsArr[item]"
                    :clone="val => domClone({ val, type: 'field' })"
                    v-bind="{ group: { name: 'ariItemLeft', pull: 'clone', put: false }, sort: false, dragClass: 'left-drag-item'}"
                    @end="dragEnd"
                >
-                 <div
-                     v-for="(item, index) in fieldsArr"
-                     :key="index"
-                     class="left-item "
-                     @click.stop="dragClick({ item, type: 'field' })"
-                 >
-                   <div class="text showEllipsis">{{ item.name }}</div>
-                 </div>
+                   <div
+                       v-for="(item2, index2) in fieldsArr[item]"
+                       :key="index2"
+                       class="left-item "
+                       @click.stop="dragClick({ item2, type: 'field' })"
+                   >
+                     <div class="text showEllipsis">{{ item2.COLUMN_COMMENT }}</div>
+                   </div>
                </draggable>
+               </div>
              </el-card>
            </div>
 
-           <div>
+           <div style="max-height: calc(100vh - 333px);overflow-y: auto;">
              <div class="same-right-wrapper">
                <div class="card-title" ><span>自定义值类型：</span></div>
                <el-card shadow="never" class="top-card">
@@ -52,7 +53,7 @@
                             :list="formulaOptions" :clone="val => domClone({ val, type: 'operator' })"  @end="dragEnd"
                  >
                    <div v-for="(item, index) in formulaOptions" :key="index" class="same-right-item center-item" @click.stop="dragClick({ item, type: 'operator' })">
-                     <span class="text top-input-item" >{{ item.name }}</span>
+                     <span class="text top-input-item" >{{ item.dictValue || item.dictName }}</span>
                    </div>
                  </draggable>
                </el-card>
@@ -90,7 +91,7 @@
                        </template>
 
                        <!-- 其他 -->
-                       <div v-else class="showEllipsis">  {{ item.name }} </div>
+                       <div v-else class="showEllipsis">  {{ item.dictValue || item.dictName || item.COLUMN_COMMENT }} </div>
                      </div>
                      <svg @click.stop="doDel({ id: item.id })" t="1641541601643" class="icon el-icon-error" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2699" width="16" height="16"><path d="M512 102.4a409.6 409.6 0 1 0 409.6 409.6 409.6 409.6 0 0 0-409.6-409.6z m181.248 518.144a51.2 51.2 0 0 1-72.704 72.704L512 584.192l-108.544 109.056a51.2 51.2 0 0 1-72.704-72.704L439.808 512 330.752 403.456a51.2 51.2 0 0 1 72.704-72.704L512 439.808l108.544-109.056a51.2 51.2 0 0 1 72.704 72.704L584.192 512z" fill="" p-id="2700"></path></svg>
                    </div>
@@ -104,47 +105,47 @@
          </div>
        </div>
      </div>
-    <div class="btn">
-      <el-button type="primary" @click="GenerateModmain(itemArr)">生成代码</el-button>
-<!--      <el-button type="primary" @click="GenerateModmain">生成modmain</el-button>-->
+    <div class="btn d2-mt-20" style="position: absolute;right: 10px">
+      <el-button type="primary" @click="GenerateModmain(itemArr,1)">生成小指令</el-button>
+      <el-button type="primary" @click="GenerateModmain(itemArr,2)">生成大指令</el-button>
     </div>
   </div>
 </template>
 
 <script>
+import { DictList } from '@/api/system/dict'
 import { uuid } from '@/libs/uuid'
 import { cloneDeep } from '@/libs/mUtils'
 import { VueDraggableNext } from 'vue-draggable-next'
+import modsTop from './components/mods-top'
+import { getSqlValue } from '@/api/base'
 export default {
   name: "index",
   components:{
-    draggable: VueDraggableNext
+    draggable: VueDraggableNext,
+    modsTop
   },
   data() {
     return {
       // 表字段集合
-      fieldsArr: [
-        { value:"sz_12", name:"测试1", fieldType:"inputNumber" },
-        { value:"srk2_13", name:"测试2", fieldType:"inputText" },
-        { value:"dx_11", name:"测试3", fieldType:"radio" },
-      ],
+      fieldsArr: [],
       // 中间底部数据
       itemArr: [],
       // 当前激活的id
       currentActiveId: '',
       // 公式配置文件
       formulaOptions: [
-        { "name":"+", "value":"3", customContent:' + ' }, { "name":"-", "value":"4", customContent:' - ' },
-        { "name":"*", "value":"5", customContent:' * ' }, { "name":"/", "value":"6", customContent:' / ' },
-        { "name":"(", "value":"8", customContent:'(' }, { "name":")", "value":"9", customContent:')' },
-        { "name":"and", "value":"10", customContent:' and ' }, { "name":"or", "value":"11", customContent:' or ' },
-        { "name":"==", "value":"12", customContent:' == ' },
-        // { "name":"includes", "value":"13" },
-        { "name":"<", "value":"14", customContent:' < ' }, { "name":"<=", "value":"15", customContent:' <= ' },
-        { "name":">", "value":"16", customContent:' > ' }, { "name":">=", "value":"17", customContent:' >= ' },
-        { "name":"~=", "value":"18", customContent:' ~= ' }, { "name":"=", "value":"19", customContent:' = ' },
-        { "name":"if", "value":"20", customContent:' if ' }, { "name":"end", "value":"21", customContent:' end ' },
-        { "name":"then", "value":"21", customContent:' then ' }
+        // { "name":"+", "value":"3", customContent:' + ' }, { "name":"-", "value":"4", customContent:' - ' },
+        // { "name":"*", "value":"5", customContent:' * ' }, { "name":"/", "value":"6", customContent:' / ' },
+        // { "name":"(", "value":"8", customContent:'(' }, { "name":")", "value":"9", customContent:')' },
+        // { "name":"and", "value":"10", customContent:' and ' }, { "name":"or", "value":"11", customContent:' or ' },
+        // { "name":"==", "value":"12", customContent:' == ' },
+        // // { "name":"includes", "value":"13" },
+        // { "name":"<", "value":"14", customContent:' < ' }, { "name":"<=", "value":"15", customContent:' <= ' },
+        // { "name":">", "value":"16", customContent:' > ' }, { "name":">=", "value":"17", customContent:' >= ' },
+        // { "name":"!==", "value":"18", customContent:' !== ' }, { "name":"=", "value":"19", customContent:' = ' },
+        // { "name":"if", "value":"20", customContent:' if ' }, { "name":"end", "value":"21", customContent:' end ' },
+        // { "name":"then", "value":"21", customContent:' then ' }
       ],
       // 公式自定义值配置文件
       formulaCustomFieldOptions: [
@@ -157,7 +158,27 @@ export default {
       ],
     }
   },
+  created() {
+    this.initialization()
+  },
   methods:{
+    async initialization(){
+      const { data } = await DictList('formula')
+      this.formulaOptions = data
+    },
+    async success(val){
+      let sql = "SELECT TABLE_NAME,COLUMN_NAME,DATA_TYPE,COLUMN_COMMENT FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='elona' AND TABLE_NAME = 'si'"
+      this.fieldsArr = []
+      val && val.forEach((res) => {
+        sql = `${sql} OR TABLE_NAME='${res}' `
+        this.fieldsArr[res] = []
+      })
+      const { data } = await getSqlValue({ sqlValue:sql })
+      data.forEach((res) => {
+        !['id', 'Id'].includes(res.COLUMN_NAME) && this.fieldsArr[res.TABLE_NAME].push(res)
+      })
+      console.log(this.fieldsArr)
+    },
     GenerateModmain(val){
       let string = ''
       let data = JSON.parse(JSON.stringify(val))
@@ -263,8 +284,9 @@ export default {
 <style scoped lang="scss">
   .configuration-mods{
     height: 100%;
+    padding: 10px;
     .content-mods{
-      padding: 10px;
+      padding-top: 10px;
       .mod-left{
         .mod-left-content{
           width: 30%;
@@ -310,6 +332,7 @@ export default {
         flex: 1;
         flex-shrink: 0;
         width: 240px;
+        max-height: calc(100vh - 333px);
         overflow-y: auto;
         .left-drag-wrapper {
           display: flex;

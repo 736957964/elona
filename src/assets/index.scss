@@ -2,3 +2,7 @@
 @import '~@/assets/style/public.scss';
 @import '~@/assets/style/unit/color.scss';
 @import '~@/assets/style/ele-reset.scss';
+
+.el-card {
+  --el-card-padding: 10px;
+}

@@ -40,3 +40,11 @@ export function reviseTableData(data) {
     data
   })
 }
+// 直接写sql
+export function getSqlValue(data) {
+  return request({
+    url: BASE_URL + '/sqlValue',
+    method: 'get',
+    params: data
+  })
+}
