@@ -11,6 +11,7 @@ const router = createRouter({
       children:[
         { path: '/system/mode', name: 'mode', component: _import('System/mode') },
         { path: '/system/dictionary', name: 'dictionary', component: _import('System/dictionary')  },
+        { path: '/system/funInstruction', name: 'funInstruction', component: _import('System/funInstruction')  },
         { path: '/system/instruct', name: 'instruct', component:_import('System/instruct') }
       ]
     },

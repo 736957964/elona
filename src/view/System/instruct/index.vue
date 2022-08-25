@@ -22,17 +22,22 @@
         <el-table-column prop="command" label="触发指令" width="180" />
         <el-table-column prop="remarks" label="备注" width="120" />
         <el-table-column prop="mode" label="模式" width="80" />
-        <el-table-column label="文本描述" width="180" >
+        <el-table-column label="成功文本描述" width="180" >
         <template v-slot="scope">
-          <text-prompt :textData="scope.row.textDescription" ></text-prompt>
+          <text-prompt :textData="scope.row.successTextDescription" ></text-prompt>
         </template>
        </el-table-column>
+        <el-table-column label="失败文本描述" width="180" >
+          <template v-slot="scope">
+            <text-prompt :textData="scope.row.errTextDescription" ></text-prompt>
+          </template>
+        </el-table-column>
         <el-table-column label="签到url" width="180" >
         <template v-slot="scope">
           <text-prompt :textData="scope.row.imageUrl" ></text-prompt>
         </template>
         </el-table-column>
-        <el-table-column label="操作" align="center" width="200">
+        <el-table-column label="操作" align="center" width="200" fixed="right">
           <template v-slot="scope">
             <el-button v-has="'dataEdit'" type="text"  @click="doEdit(scope.row)">修改</el-button>
             <el-button v-has="'dataConfig'" type="text" @click="doConfig(scope.row, 1)">配置</el-button>

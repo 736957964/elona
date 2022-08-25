@@ -106,9 +106,10 @@
        </div>
      </div>
     <div class="btn d2-mt-20" style="position: absolute;right: 10px">
-      <el-button type="primary" @click="GenerateModmain(itemArr,1)">生成小指令</el-button>
-      <el-button type="primary" @click="GenerateModmain(itemArr,2)">生成大指令</el-button>
+<!--      <el-button type="primary" @click="GenerateModmain(itemArr,1)">生成功能模板</el-button>-->
+      <el-button type="primary" @click="GenerateModmain(itemArr,2)">生成功能指令</el-button>
     </div>
+    <fun-instruction-dialog v-model:dialog-visible="testDialog" :current-row-obj="currentRowObj" @success="fnDoSuccess" />
   </div>
 </template>
 
@@ -119,14 +120,17 @@ import { cloneDeep } from '@/libs/mUtils'
 import { VueDraggableNext } from 'vue-draggable-next'
 import modsTop from './components/mods-top'
 import { getSqlValue } from '@/api/base'
+import funInstructionDialog from '@/components/configuration-mods/components/fun-instruction-dialog'
 export default {
   name: "index",
   components:{
     draggable: VueDraggableNext,
-    modsTop
+    modsTop, funInstructionDialog
   },
   data() {
     return {
+      testDialog:false,
+      currentRowObj:{}, // 处理好的数据
       // 表字段集合
       fieldsArr: [],
       // 中间底部数据
@@ -135,26 +139,13 @@ export default {
       currentActiveId: '',
       // 公式配置文件
       formulaOptions: [
-        // { "name":"+", "value":"3", customContent:' + ' }, { "name":"-", "value":"4", customContent:' - ' },
-        // { "name":"*", "value":"5", customContent:' * ' }, { "name":"/", "value":"6", customContent:' / ' },
-        // { "name":"(", "value":"8", customContent:'(' }, { "name":")", "value":"9", customContent:')' },
-        // { "name":"and", "value":"10", customContent:' and ' }, { "name":"or", "value":"11", customContent:' or ' },
-        // { "name":"==", "value":"12", customContent:' == ' },
-        // // { "name":"includes", "value":"13" },
-        // { "name":"<", "value":"14", customContent:' < ' }, { "name":"<=", "value":"15", customContent:' <= ' },
-        // { "name":">", "value":"16", customContent:' > ' }, { "name":">=", "value":"17", customContent:' >= ' },
-        // { "name":"!==", "value":"18", customContent:' !== ' }, { "name":"=", "value":"19", customContent:' = ' },
-        // { "name":"if", "value":"20", customContent:' if ' }, { "name":"end", "value":"21", customContent:' end ' },
-        // { "name":"then", "value":"21", customContent:' then ' }
+        // { "name":"+", "value":"3", customContent:' + ' }, { "name":"-", "value":"4", customContent:' - ' }
       ],
       // 公式自定义值配置文件
       formulaCustomFieldOptions: [
         { name:"String", value:"0" },
         { name:"Number", value:"1" },
-        { name:"Boolean", value:"2" },
-        { name:"zdy-String", value:"100" },
-        { name:"zdy-Number", value:"101" },
-        { name:"zdy-Boolean", value:"102" }
+        { name:"Boolean", value:"2" }
       ],
     }
   },
@@ -165,6 +156,19 @@ export default {
     async initialization(){
       const { data } = await DictList('formula')
       this.formulaOptions = data
+      if(this.$route.query.isGet || this.$route.query.isClone){
+        const funInstruction = JSON.parse(sessionStorage.getItem('funInstruction'))
+        const { funJson, instructName, remarks, id } = funInstruction
+        this.itemArr = JSON.parse(funJson) || []
+        this.currentRowObj = {
+          instructName, remarks,
+          ...(this.$route.query.isGet ? { id } : '')
+        }
+      }
+    },
+    fnDoSuccess(){
+      this.currentRowObj = {}
+      this.itemArr = []
     },
     async success(val){
       let sql = "SELECT TABLE_NAME,COLUMN_NAME,DATA_TYPE,COLUMN_COMMENT FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='elona' AND TABLE_NAME = 'si'"
@@ -181,12 +185,44 @@ export default {
     },
     GenerateModmain(val){
       let string = ''
+      let QUERY_TABLE = []
       let data = JSON.parse(JSON.stringify(val))
-      console.log(data)
       data.forEach((res)=> {
-        string = string + res.customContent
+        switch (true){
+          case !!res.dictValue:
+            switch (res.dictValue){
+              case 'if':  string = string + 'if(';break
+              case 'then':  string = string + '){';break
+              case 'end':  string = string + '}';break
+              case 'else':  string = string + '}else{';break
+              case 'return false':
+                if(string.charAt(string.length - 1) === '{'){ string = `${string} ${res.dictValue}` }else { string = string + ';return false'  }
+                break
+              case 'return true':
+                if(string.charAt(string.length - 1) === '{'){ string = `${string} ${res.dictValue}`}else {  string = string + ';return true' }
+                break
+              default:string = `${string} ${res.dictValue}`
+            }
+            break
+          case !!res.TABLE_NAME:
+            string =  `${string}data.${res.TABLE_NAME}`
+            QUERY_TABLE.push(res.TABLE_NAME)
+            break
+          case !!res.customContent:
+            string = `${string}${res.customContent}`
+            break
+          default:
+        }
       })
-      console.log(string)
+      QUERY_TABLE = [...new Set(QUERY_TABLE)] // 去重
+      const { instructName, remarks, id } = this.currentRowObj
+      this.currentRowObj = {
+        ...{ instructName, remarks, id },
+        funJson:JSON.stringify(val), // 回显的数据
+        jsEval:string, // 需要执行的指令
+        QUERY_TABLE: QUERY_TABLE.join(',') // 需要进行查询的表
+      }
+      this.testDialog = true
     },
     /**
      * clone数据格式化

@@ -27,6 +27,7 @@ export default {
     let routerUrl = ref([
       { path:'/system/mode', name: '自定义',  },
       { path:'/system/dictionary', name: '字典' },
+      { path:'/system/funInstruction', name: '功能指令' },
       { path:'/system/instruct', name: '指令合集' }
     ])
     return {

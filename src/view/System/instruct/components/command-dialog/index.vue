@@ -25,29 +25,23 @@
           />
         </el-form-item>
 
-        <el-form-item label="文本描述" prop="textDescription" v-if="ruleForm.mode!=='3'">
-          <el-input
-              v-model="ruleForm.textDescription"
-              type="textarea"
-              rows="5"
-              placeholder="请输入文本描述"
-          />
+        <el-form-item label="文本描述" prop="successTextDescription" v-if="ruleForm.mode==='1'">
+          <el-input v-model="ruleForm.successTextDescription" type="textarea" rows="5" placeholder="请输入文本描述"  />
         </el-form-item>
-
+        <span v-if="ruleForm.mode!=='1'">
+          <el-form-item label="成功文本描述" prop="successTextDescription" >
+            <el-input v-model="ruleForm.successTextDescription" type="textarea" rows="3" placeholder="请输入成功文本描述(需选择的指令返回true)"  />
+          </el-form-item>
+           <el-form-item label="失败文本描述" prop="errTextDescription" >
+            <el-input v-model="ruleForm.errTextDescription" type="textarea" rows="3" placeholder="请输入失败文本描述(需选择的指令返回false)"  />
+          </el-form-item>
+        </span>
         <el-form-item label="图片url" prop="imageUrl">
-          <el-input
-              v-model="ruleForm.imageUrl"
-              placeholder="请输入图片url"
-          />
+          <el-input v-model="ruleForm.imageUrl" placeholder="请输入图片url"/>
         </el-form-item>
 
         <el-form-item label="描述" prop="remarks">
-          <el-input
-              v-model="ruleForm.remarks"
-              type="textarea"
-              rows="2"
-              placeholder="请输入描述"
-          />
+          <el-input   v-model="ruleForm.remarks"  type="textarea"  rows="2"    placeholder="请输入描述"  />
         </el-form-item>
       </el-form>
       <template v-slot:footer>
@@ -81,7 +75,8 @@ export default {
         command: '签到',   // 触发指令
         remarks: '签到备注', // 备注
         mode:'1', // 1普通模式 2 特殊模式
-        textDescription: '签到描述',  // 文本描述
+        successTextDescription: '成功描述',  // 成功文本描述
+        errTextDescription:'失败描述', // 失败文本描述
         imageUrl:'签到url' // 图片的url
       },
     }
@@ -103,7 +98,7 @@ export default {
       switch (mode){
         case '1':break;
         case '2':break;
-        case '3':ruleForm.textDescription = '';ruleForm.imageUrl = '';break;
+        case '3':ruleForm.successTextDescription = '';ruleForm.imageUrl = '';break;
         default:
       }
       console.log(keys)
