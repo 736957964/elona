@@ -6,12 +6,13 @@
         :destroy-on-close="true"
         :model-value="dialogVisible"
         @close="close"
+        top="50px"
         class="dialog-wrapper"
     >
       <el-form
           ref="ruleForm"
           :model="ruleForm"
-          label-position="top"
+          label-position="left"
       >
         <el-form-item label="触发指令" prop="command">
           <el-radio v-model="ruleForm.mode" label="1">普通文本模式</el-radio>
@@ -24,9 +25,11 @@
               placeholder="触发指令"
           />
         </el-form-item>
-
         <el-form-item label="文本描述" prop="successTextDescription" v-if="ruleForm.mode==='1'">
           <el-input v-model="ruleForm.successTextDescription" type="textarea" rows="5" placeholder="请输入文本描述"  />
+        </el-form-item>
+        <el-form-item label="功能指令" prop="selectFunction" >
+          <select-function ref="selectFunction" @success="doSuccess"/>
         </el-form-item>
         <span v-if="ruleForm.mode!=='1'">
           <el-form-item label="成功文本描述" prop="successTextDescription" >
@@ -58,7 +61,7 @@
 <script>
 import dialogMixin from "@/mixins/dialogMixin";
 import { insertTableData, reviseTableData } from "@/api/base";
-
+import  selectFunction from '../select-function'
 export default {
   name: "index",
   mixins: [dialogMixin],
@@ -69,6 +72,7 @@ export default {
       default: () => ({})
     }
   },
+  components:{ selectFunction },
   data(){
     return{
       ruleForm: {
@@ -85,9 +89,22 @@ export default {
     /**
      * 初始化弹窗
      */
-    initForm() {
+    async initForm() {
       if (this.currentRowObj) {
         Object.assign(this.ruleForm, this.currentRowObj)
+        await this.$nextTick()
+        this.$refs.selectFunction.value = this.ruleForm.selectFunction
+      }
+    },
+    doSuccess(val, data){
+      this.ruleForm.selectFunction = val
+      if(data){
+        const { jsEval, QUERY_TABLE } = data
+        this.ruleForm.jsEval = jsEval
+        this.ruleForm.QUERY_TABLE = QUERY_TABLE
+      }else {
+        this.ruleForm.jsEval = ''
+        this.ruleForm.QUERY_TABLE = ''
       }
     },
     async doSubmit() {
@@ -101,13 +118,11 @@ export default {
         case '3':ruleForm.successTextDescription = '';ruleForm.imageUrl = '';break;
         default:
       }
-      console.log(keys)
       let keysData = null, reviseData = null
       keys.forEach((res, index) => {
         keysData = keysData !== null ? index + 1 === keys.length ? `${keysData}${this.ruleForm[res]}'` : `${keysData}${this.ruleForm[res]}','` : index + 1 === keys.length ? `'${this.ruleForm[res]}'` : `'${this.ruleForm[res]}','`
         reviseData = reviseData !== null ? index + 1 === keys.length ? `${reviseData}${res}='${this.ruleForm[res]}'` : `${reviseData}${res}='${this.ruleForm[res]}',` : `${res}='${this.ruleForm[res]}',`
       })
-      console.log(reviseData)
       let data = {
         tableName: 'command',
         ...(this.currentRowObj ? { reviseSqlValue:`${reviseData} WHERE id='${id}'` } : { sqlValue:`(${keys.join(',')}) VALUES (${keysData})` })

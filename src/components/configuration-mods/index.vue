@@ -196,10 +196,10 @@ export default {
               case 'end':  string = string + '}';break
               case 'else':  string = string + '}else{';break
               case 'return false':
-                if(string.charAt(string.length - 1) === '{'){ string = `${string} ${res.dictValue}` }else { string = string + ';return false'  }
+                if(string.charAt(string.length - 1) === '{'){ string = `${string} ${res.dictValue}` }else { string = string + ';returns = false'  }
                 break
               case 'return true':
-                if(string.charAt(string.length - 1) === '{'){ string = `${string} ${res.dictValue}`}else {  string = string + ';return true' }
+                if(string.charAt(string.length - 1) === '{'){ string = `${string} ${res.dictValue}`}else {  string = string + ';returns = true' }
                 break
               default:string = `${string} ${res.dictValue}`
             }
