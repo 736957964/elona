@@ -28,7 +28,7 @@
         <el-form-item label="文本描述" prop="successTextDescription" v-if="ruleForm.mode==='1'">
           <el-input v-model="ruleForm.successTextDescription" type="textarea" rows="5" placeholder="请输入文本描述"  />
         </el-form-item>
-        <el-form-item label="功能指令" prop="selectFunction" >
+        <el-form-item label="功能指令" prop="selectFunction" v-if="ruleForm.mode!=='1'">
           <select-function ref="selectFunction" @success="doSuccess"/>
         </el-form-item>
         <span v-if="ruleForm.mode!=='1'">
@@ -76,12 +76,12 @@ export default {
   data(){
     return{
       ruleForm: {
-        command: '签到',   // 触发指令
-        remarks: '签到备注', // 备注
+        command: '',   // 触发指令
+        remarks: '', // 备注
         mode:'1', // 1普通模式 2 特殊模式
-        successTextDescription: '成功描述',  // 成功文本描述
-        errTextDescription:'失败描述', // 失败文本描述
-        imageUrl:'签到url' // 图片的url
+        successTextDescription: '',  // 成功文本描述
+        errTextDescription:'', // 失败文本描述
+        imageUrl:'' // 图片的url
       },
     }
   },
@@ -98,6 +98,7 @@ export default {
     },
     doSuccess(val, data){
       this.ruleForm.selectFunction = val
+      console.log(val, data)
       if(data){
         const { jsEval, QUERY_TABLE } = data
         this.ruleForm.jsEval = jsEval
@@ -127,8 +128,9 @@ export default {
         tableName: 'command',
         ...(this.currentRowObj ? { reviseSqlValue:`${reviseData} WHERE id='${id}'` } : { sqlValue:`(${keys.join(',')}) VALUES (${keysData})` })
       }
+      console.log(data)
       try {
-        await (this.currentRowObj ? reviseTableData : insertTableData)(data)
+        await (this.currentRowObj ? reviseTableData : insertTableData)(this.$clearEmptyObjAttritube(data))
         this.$message.success(`指令${this.currentRowObj ? '修改' : '新增'}成功`)
         this.$emit('success')
         this.close()

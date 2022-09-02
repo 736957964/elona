@@ -72,7 +72,7 @@ export default {
         const data = {
           tableName: 'funinstruction',
           sqlValue:`(funJson,jsEval,QUERY_TABLE,instructName,remarks) VALUES ('${funJson}','${jsEval}','${QUERY_TABLE}','${instructName}','${remarks}')`,
-          reviseSqlValue:`instructName='${instructName}',remarks='${remarks}' WHERE id='${id}'`
+          reviseSqlValue:`instructName='${instructName}',remarks='${remarks}',funJson='${funJson}',jsEval='${jsEval}' WHERE id='${id}'`
         }
         await (!!this.currentRowObj.id ? reviseTableData : insertTableData)(data)
         this.$message.success(

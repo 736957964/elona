@@ -7,9 +7,7 @@
 export default {
   name: 'App',
   data() {
-    return{
-      map: null,
-    }
+    return{}
   },
   components: {
 

@@ -89,7 +89,8 @@
                            />
                          </el-select>
                        </template>
-
+                       <!--终止符号-->
+                       <div v-if="item.value === '3'">;</div>
                        <!-- 其他 -->
                        <div v-else class="showEllipsis">  {{ item.dictValue || item.dictName || item.COLUMN_COMMENT }} </div>
                      </div>
@@ -145,7 +146,8 @@ export default {
       formulaCustomFieldOptions: [
         { name:"String", value:"0" },
         { name:"Number", value:"1" },
-        { name:"Boolean", value:"2" }
+        { name:"Boolean", value:"2" },
+        { name:"分隔符", value:"3" }
       ],
     }
   },
@@ -153,6 +155,9 @@ export default {
     this.initialization()
   },
   methods:{
+    change(val){
+      console.log(val)
+    },
     async initialization(){
       const { data } = await DictList('formula')
       this.formulaOptions = data
@@ -196,23 +201,24 @@ export default {
               case 'end':  string = string + '}';break
               case 'else':  string = string + '}else{';break
               case 'return false':
-                if(string.charAt(string.length - 1) === '{'){ string = `${string} ${res.dictValue}` }else { string = string + ';returns = false'  }
+                if(string.charAt(string.length - 1) === '{'){ string = `${string} returns = false` }else { string = string + ';returns = false'  }
                 break
               case 'return true':
-                if(string.charAt(string.length - 1) === '{'){ string = `${string} ${res.dictValue}`}else {  string = string + ';returns = true' }
+                if(string.charAt(string.length - 1) === '{'){ string = `${string} returns = true`}else {  string = string + ';returns = true' }
                 break
               default:string = `${string} ${res.dictValue}`
             }
             break
           case !!res.TABLE_NAME:
-            string =  `${string}data.${res.TABLE_NAME}`
+            string =  `${string}data.${res.TABLE_NAME}.${res.COLUMN_NAME}`
             QUERY_TABLE.push(res.TABLE_NAME)
             break
-          case !!res.customContent:
-            string = `${string}${res.customContent}`
+          case (!!res.customContent || res.customContent === 0):
+            string = `${string} ${res.customContent} `
             break
           default:
         }
+        console.log(string)
       })
       QUERY_TABLE = [...new Set(QUERY_TABLE)] // 去重
       const { instructName, remarks, id } = this.currentRowObj
