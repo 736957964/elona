@@ -30,7 +30,7 @@
              </el-card>
            </div>
 
-           <div style="max-height: calc(100vh - 333px);overflow-y: auto;">
+           <div >
              <div class="same-right-wrapper">
                <div class="card-title" ><span>自定义值类型：</span></div>
                <el-card shadow="never" class="top-card">
@@ -46,7 +46,6 @@
 
              <div class="same-right-wrapper">
                <div class="card-title" flex="main:justify cross:center"><span>公式元素符：</span></div>
-
                <el-card shadow="never" class="top-card">
                  <draggable class="same-right-drag-wrapper"
                             v-bind="{ group: { name: 'ariItemCenter', pull: 'clone', put: false },sort: false,dragClass: 'center-drag-item'}"
@@ -59,7 +58,7 @@
                </el-card>
              </div>
 
-             <div class="bottom-wrapper" flex="dir:top">
+             <div class="bottom-wrapper" flex="dir:top" style="max-height: calc(100vh - 250px);overflow-y: auto;">
                <div class="card-title" flex="main:justify cross:center">
                  <span>公式：</span>
                  <el-button type="text" :disabled="!itemArr.length" @click="doClear"><i class="icon iconfont icon-lajitong clear" />清空</el-button>
@@ -193,6 +192,7 @@ export default {
       let QUERY_TABLE = []
       let data = JSON.parse(JSON.stringify(val))
       data.forEach((res)=> {
+        console.log(res)
         switch (true){
           case !!res.dictValue:
             switch (res.dictValue){
@@ -214,11 +214,14 @@ export default {
             QUERY_TABLE.push(res.TABLE_NAME)
             break
           case (!!res.customContent || res.customContent === 0):
-            string = `${string} ${res.customContent} `
+            string = `${string} ${res.customContent}`
+            break
+          case res.name === '分隔符':
+            string = `${string};`
             break
           default:
         }
-        console.log(string)
+        // console.log(string)
       })
       QUERY_TABLE = [...new Set(QUERY_TABLE)] // 去重
       const { instructName, remarks, id } = this.currentRowObj
@@ -374,7 +377,7 @@ export default {
         flex: 1;
         flex-shrink: 0;
         width: 240px;
-        max-height: calc(100vh - 333px);
+        max-height: calc(100vh - 250px);
         overflow-y: auto;
         .left-drag-wrapper {
           display: flex;
@@ -420,7 +423,8 @@ export default {
       .bottom-wrapper {
         flex: 1;
         .bottom-card {
-          flex: 1;
+          height: 250px;
+          overflow-y: auto;
           .el-card__body {
             min-height: 300px;
             position: relative;
